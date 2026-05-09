@@ -130,31 +130,3 @@ describe("isValidPassword", () => {
 
 });
 
-
-
-
-
-
-
-/**
- * 
- * 
- * 1
-Happy path
-A strong valid password returns valid: true and an empty reason.
-2
-Too short
-A 7-character password should fail with the "Too short" reason.
-3
-No uppercase
-A password with only lowercase + numbers should fail.
-4
-No number
-Letters only, even with uppercase, should fail.
-5
-Wrong type
-Pass a number, null, or undefined instead of a string.
-6
-Edge case
-What's the shortest possible valid password? Test exactly 8 chars.
- */
