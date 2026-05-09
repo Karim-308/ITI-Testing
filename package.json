@@ -1,0 +1,15 @@
+{
+  "name": "iti-testing",
+  "version": "1.0.0",
+  "main": "validatior.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "jest": "^29.6.1"
+  }
+}
