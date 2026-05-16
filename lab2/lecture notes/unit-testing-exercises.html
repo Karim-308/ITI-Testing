@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unit Testing — Exercises</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Fraunces:ital,wght@0,400;0,600;1,400&display=swap"
+    rel="stylesheet" />
+  <style>
+    :root {
+      --font-sans: 'Fraunces', Georgia, serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --color-background-primary: #ffffff;
+      --color-background-secondary: #f5f4f0;
+      --color-background-info: #E6F1FB;
+      --color-text-primary: #1a1a1a;
+      --color-text-secondary: #5a5a5a;
+      --color-text-info: #0C447C;
+      --color-border-tertiary: rgba(0, 0, 0, 0.12);
+      --color-border-secondary: rgba(0, 0, 0, 0.22);
+      --border-radius-md: 8px;
+      --border-radius-lg: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #faf9f6;
+      font-family: var(--font-sans);
+      color: var(--color-text-primary);
+      padding: 3rem 1.5rem 6rem;
+    }
+
+    .session {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .page-divider {
+      border: none;
+      border-top: 1.5px dashed #d4d0c8;
+      margin: 3.5rem 0;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+    }
+
+    .badge-session {
+      background: var(--color-background-info);
+      color: var(--color-text-info);
+    }
+
+    .badge-mock {
+      background: #FAECE7;
+      color: #993C1D;
+    }
+
+    .badge-async {
+      background: #EAF3DE;
+      color: #3B6D11;
+    }
+
+    .badge-hooks {
+      background: #EEEDFE;
+      color: #3C3489;
+    }
+
+    .badge-tdd {
+      background: #E1F5EE;
+      color: #085041;
+    }
+
+    .badge-amber {
+      background: #FAEEDA;
+      color: #633806;
+    }
+
+    .badge-red {
+      background: #FCEBEB;
+      color: #791F1F;
+    }
+
+    .badge-level {
+      background: #FFF3E0;
+      color: #8B4513;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 2.5rem 0 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 0.5px solid var(--color-border-tertiary);
+    }
+
+    .section-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .card {
+      background: var(--color-background-primary);
+      border: 0.5px solid var(--color-border-tertiary);
+      border-radius: var(--border-radius-lg);
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 6px;
+    }
+
+    .card-body {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      line-height: 1.65;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .callout {
+      border-radius: var(--border-radius-md);
+      padding: 1rem 1.25rem;
+      margin: 0.75rem 0;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .callout-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+
+    .callout-tip {
+      background: #EAF3DE;
+      border-left: 3px solid #3B6D11;
+    }
+
+    .callout-tip .callout-label {
+      color: #3B6D11;
+    }
+
+    .callout-warn {
+      background: #FAEEDA;
+      border-left: 3px solid #c07000;
+    }
+
+    .callout-warn .callout-label {
+      color: #c07000;
+    }
+
+    .callout-info {
+      background: var(--color-background-info);
+      border-left: 3px solid #0C447C;
+    }
+
+    .callout-info .callout-label {
+      color: #0C447C;
+    }
+
+    .code-block {
+      background: #1e1e2e;
+      border-radius: var(--border-radius-md);
+      padding: 1rem 1.25rem;
+      margin: 0.65rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      line-height: 1.75;
+    }
+
+    .code-block pre {
+      color: #cdd6f4;
+      white-space: pre;
+    }
+
+    .kw {
+      color: #cba6f7;
+    }
+
+    .fn {
+      color: #89b4fa;
+    }
+
+    .str {
+      color: #a6e3a1;
+    }
+
+    .cm {
+      color: #6c7086;
+      font-style: italic;
+    }
+
+    .num {
+      color: #fab387;
+    }
+
+    .vr {
+      color: #f38ba8;
+    }
+
+    .fl {
+      color: #89dceb;
+    }
+
+    .file-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #6c7086;
+      display: block;
+      margin-bottom: -4px;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      background: var(--color-background-secondary);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    .page-title-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--color-text-primary);
+    }
+
+    .page-title-bar .title {
+      font-size: 13px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      color: var(--color-text-secondary);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .page-title-bar .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #fab387;
+      flex-shrink: 0;
+    }
+
+    .session-intro {
+      padding-bottom: 1.5rem;
+      border-bottom: 0.5px solid var(--color-border-tertiary);
+      margin-bottom: 0.5rem;
+    }
+
+    .session-intro h1 {
+      font-size: 32px;
+      font-weight: 600;
+      line-height: 1.2;
+      color: var(--color-text-primary);
+      margin: 10px 0 8px;
+    }
+
+    .session-intro p {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      line-height: 1.65;
+    }
+
+    .toc {
+      background: var(--color-background-secondary);
+      border-radius: var(--border-radius-lg);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .toc-title {
+      font-size: 11px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-secondary);
+      margin-bottom: 10px;
+    }
+
+    .toc-sub {
+      padding-left: 16px;
+    }
+
+    .toc a {
+      display: block;
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      padding: 3px 0;
+      font-family: var(--font-mono);
+    }
+
+    .toc a:hover {
+      color: var(--color-text-primary);
+    }
+
+    .toc a .toc-num {
+      color: #89b4fa;
+      margin-right: 8px;
+      font-weight: 600;
+    }
+
+    /* ── exercise-specific ── */
+    .ex-block {
+      background: var(--color-background-primary);
+      border: 0.5px solid var(--color-border-tertiary);
+      border-radius: var(--border-radius-lg);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .ex-block+.ex-block {
+      margin-top: 0;
+    }
+
+    .task-list {
+      list-style: none;
+      padding: 0;
+      margin: 0.75rem 0 0;
+    }
+
+    .task-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      padding: 5px 0;
+      border-bottom: 0.5px solid var(--color-border-tertiary);
+    }
+
+    .task-list li:last-child {
+      border-bottom: none;
+    }
+
+    .task-list .check {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      flex-shrink: 0;
+      border: 1.5px solid var(--color-border-secondary);
+      background: var(--color-background-secondary);
+      margin-top: 2px;
+    }
+
+    .task-list li strong {
+      color: var(--color-text-primary);
+    }
+
+    .bonus-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      background: #FFF3E0;
+      color: #8B4513;
+      padding: 1px 7px;
+      border-radius: 10px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    .assert-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 12.5px;
+      color: var(--color-text-secondary);
+      font-family: var(--font-mono);
+      line-height: 1.6;
+      padding: 4px 0;
+      border-bottom: 0.5px solid var(--color-border-tertiary);
+    }
+
+    .assert-row:last-child {
+      border-bottom: none;
+    }
+
+    .assert-arrow {
+      color: #89b4fa;
+      flex-shrink: 0;
+    }
+
+    .ex-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .ex-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="session">
+
+    <div class="page-title-bar">
+      <div class="dot"></div>
+      <span class="title">JavaScript · Unit Testing · Exercises</span>
+    </div>
+
+    <div class="session-intro">
+      <span class="badge badge-level">Mid-level</span>
+      <h1>Hands-on<br>Exercises</h1>
+      <p>Three exercises covering mocking, async testing, MongoDB with <code>mongodb-memory-server</code>. Each exercise
+        gives you the starting code — you write the tests.</p>
+    </div>
+
+    <div class="toc">
+      <div class="toc-title">Exercises</div>
+      <div class="toc-sub">
+        <a href="#ex-1"><span class="toc-num">01</span>Mocking a service with side effects</a>
+        <a href="#ex-2"><span class="toc-num">02</span>Async — retry logic</a>
+        <a href="#ex-3"><span class="toc-num">03</span>MongoDB with mongodb-memory-server</a>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════
+       01 — MOCKING A SERVICE WITH SIDE EFFECTS
+  ═══════════════════════════════════════ -->
+    <div id="ex-1" class="section-header">
+      <span class="badge badge-mock">01</span>
+      <span class="section-title">Mocking a service with side effects</span>
+    </div>
+
+    <p style="font-size:13px;color:var(--color-text-secondary);line-height:1.65;margin-bottom:0.75rem;">
+      The <code>orderService</code> below charges a payment, then sends a confirmation email. Both are external calls —
+      your tests must never fire either one for real. Your job: mock both dependencies and verify the business logic in
+      between.
+    </p>
+
+    <span class="file-label">// paymentService.js</span>
+    <div class="code-block">
+      <pre><span class="kw">async function</span> <span class="fn">charge</span>(userId, amount) {
+  <span class="cm">// calls Stripe — never run this in tests</span>
+  <span class="kw">return</span> { success: <span class="kw">true</span>, transactionId: <span class="str">'txn_live_abc123'</span> };
+}
+module.exports = { charge };</pre>
+    </div>
+
+    <span class="file-label">// emailService.js</span>
+    <div class="code-block">
+      <pre><span class="kw">async function</span> <span class="fn">sendOrderConfirmation</span>(email, transactionId) {
+  <span class="cm">// calls SendGrid — never run this in tests</span>
+  <span class="kw">return</span> { sent: <span class="kw">true</span> };
+}
+module.exports = { sendOrderConfirmation };</pre>
+    </div>
+
+    <span class="file-label">// orderService.js — this is what you're testing</span>
+    <div class="code-block">
+      <pre><span class="kw">const</span> { charge }                  = <span class="fn">require</span>(<span class="str">'./paymentService'</span>);
+<span class="kw">const</span> { sendOrderConfirmation }   = <span class="fn">require</span>(<span class="str">'./emailService'</span>);
+
+<span class="kw">async function</span> <span class="fn">placeOrder</span>(userId, email, amount) {
+  <span class="kw">if</span> (amount &lt;= <span class="num">0</span>) <span class="kw">throw new</span> <span class="fn">Error</span>(<span class="str">'Invalid amount'</span>);
+
+  <span class="kw">const</span> <span class="vr">result</span> = <span class="kw">await</span> <span class="fn">charge</span>(userId, amount);
+  <span class="kw">if</span> (!<span class="vr">result</span>.success) <span class="kw">throw new</span> <span class="fn">Error</span>(<span class="str">'Payment failed'</span>);
+
+  <span class="kw">await</span> <span class="fn">sendOrderConfirmation</span>(email, <span class="vr">result</span>.transactionId);
+  <span class="kw">return</span> { orderId: <span class="str">`order_<span class="vr">${Date.now()}</span>`</span>, transactionId: <span class="vr">result</span>.transactionId };
+}
+
+module.exports = { placeOrder };</pre>
+    </div>
+
+    <div class="ex-block">
+      <div class="ex-meta">
+        <span class="ex-title">🧩 Your task — write <code>orderService.test.js</code></span>
+      </div>
+      <ul class="task-list">
+        <li><span class="check"></span><span>Mock <strong>both</strong> <code>paymentService</code> and
+            <code>emailService</code> modules entirely</span></li>
+        <li><span class="check"></span><span>Test: a valid order returns an object with <strong>both</strong>
+            <code>orderId</code> and <code>transactionId</code></span></li>
+        <li><span class="check"></span><span>Test: <code>sendOrderConfirmation</code> is called with the correct email
+            and the transactionId that came back from <code>charge</code></span></li>
+        <li><span class="check"></span><span>Test: an amount of <code>0</code> throws <code>'Invalid amount'</code> —
+            and <code>charge</code> is <strong>never</strong> called</span></li>
+        <li><span class="check"></span><span>Test: when <code>charge</code> resolves with
+            <code>{ success: false }</code>, the function throws <code>'Payment failed'</code> — and
+            <code>sendOrderConfirmation</code> is <strong>never</strong> called <span
+              class="bonus-tag">bonus</span></span></li>
+      </ul>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-label">💡 Hint</div>
+      Use <code>expect(fn).not.toHaveBeenCalled()</code> to assert a mock was <em>never</em> touched. Reset mocks
+      between tests with <code>beforeEach(() =&gt; jest.clearAllMocks())</code>.
+    </div>
+
+    <div class="callout callout-warn">
+      <div class="callout-label">⚠️ Watch out</div>
+      <code>jest.mock()</code> hoists to the top of the file — declare it before any <code>require</code> calls. Don't
+      try to conditionally mock inside a test.
+    </div>
+
+
+    <hr class="page-divider" />
+
+
+    <!-- ═══════════════════════════════════════
+       02 — ASYNC: RETRY LOGIC
+  ═══════════════════════════════════════ -->
+    <div id="ex-2" class="section-header">
+      <span class="badge badge-async">02</span>
+      <span class="section-title">Async — retry logic</span>
+    </div>
+
+    <p style="font-size:13px;color:var(--color-text-secondary);line-height:1.65;margin-bottom:0.75rem;">
+      <code>fetchWithRetry</code> calls an external API and retries up to <code>maxRetries</code> times on failure.
+      Testing retry logic is tricky — you need the same mock to behave differently on consecutive calls. This exercise
+      is about sequencing mock responses.
+    </p>
+
+    <span class="file-label">// apiClient.js</span>
+    <div class="code-block">
+      <pre><span class="kw">const</span> axios = <span class="fn">require</span>(<span class="str">'axios'</span>);
+
+<span class="kw">async function</span> <span class="fn">getData</span>(url) {
+  <span class="kw">const</span> { <span class="vr">data</span> } = <span class="kw">await</span> axios.<span class="fn">get</span>(url);
+  <span class="kw">return</span> <span class="vr">data</span>;
+}
+
+module.exports = { getData };</pre>
+    </div>
+
+    <span class="file-label">// fetchWithRetry.js — this is what you're testing</span>
+    <div class="code-block">
+      <pre><span class="kw">const</span> { getData } = <span class="fn">require</span>(<span class="str">'./apiClient'</span>);
+
+<span class="kw">async function</span> <span class="fn">fetchWithRetry</span>(url, maxRetries = <span class="num">3</span>) {
+  <span class="kw">let</span> <span class="vr">lastError</span>;
+
+  <span class="kw">for</span> (<span class="kw">let</span> <span class="vr">attempt</span> = <span class="num">1</span>; <span class="vr">attempt</span> &lt;= maxRetries; <span class="vr">attempt</span>++) {
+    <span class="kw">try</span> {
+      <span class="kw">return await</span> <span class="fn">getData</span>(url);
+    } <span class="kw">catch</span> (err) {
+      <span class="vr">lastError</span> = err;
+    }
+  }
+
+  <span class="kw">throw new</span> <span class="fn">Error</span>(<span class="str">`Failed after <span class="vr">${maxRetries}</span> attempts: <span class="vr">${lastError.message}</span>`</span>);
+}
+
+module.exports = { fetchWithRetry };</pre>
+    </div>
+
+    <div class="ex-block">
+      <div class="ex-meta">
+        <span class="ex-title">🧩 Your task — write <code>fetchWithRetry.test.js</code></span>
+      </div>
+      <ul class="task-list">
+        <li><span class="check"></span><span>Mock <code>apiClient</code>. Test: first attempt succeeds —
+            <code>getData</code> is called exactly <strong>once</strong> and the data is returned</span></li>
+        <li><span class="check"></span><span>Test: first attempt fails, second succeeds — <code>getData</code> is called
+            exactly <strong>twice</strong> and the data is still returned correctly</span></li>
+        <li><span class="check"></span><span>Test: all 3 attempts fail — the function throws
+            <code>'Failed after 3 attempts: …'</code> and <code>getData</code> was called <strong>3
+              times</strong></span></li>
+        <li><span class="check"></span><span>Test: passing <code>maxRetries = 1</code> with a failing mock throws after
+            exactly <strong>1</strong> call <span class="bonus-tag">bonus</span></span></li>
+      </ul>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-label">💡 Hint — sequencing responses</div>
+      Chain <code>mockResolvedValueOnce</code> / <code>mockRejectedValueOnce</code> calls — each one is consumed in
+      order:
+      <div class="code-block" style="margin-top:0.5rem;">
+        <pre>getData
+  .<span class="fn">mockRejectedValueOnce</span>(<span class="kw">new</span> <span class="fn">Error</span>(<span class="str">'timeout'</span>))   <span class="cm">// attempt 1 fails</span>
+  .<span class="fn">mockResolvedValueOnce</span>({ id: <span class="num">1</span> });              <span class="cm">// attempt 2 succeeds</span></pre>
+      </div>
+    </div>
+
+
+    <hr class="page-divider" />
+
+
+    <!-- ═══════════════════════════════════════
+       03 — MONGODB WITH MEMORY SERVER
+  ═══════════════════════════════════════ -->
+    <div id="ex-3" class="section-header">
+      <span class="badge badge-hooks">03</span>
+      <span class="section-title">MongoDB with <code>mongodb-memory-server</code></span>
+    </div>
+
+    <p style="font-size:13px;color:var(--color-text-secondary);line-height:1.65;margin-bottom:0.75rem;">
+      You have a <code>Product</code> model and a <code>productService</code> that queries it directly. Wire up an
+      in-memory MongoDB instance and test the full Mongoose query path — including schema validation and the
+      duplicate-slug guard.
+    </p>
+
+    <div class="callout callout-info">
+      <div class="callout-label">📦 Dependencies needed</div>
+      <code>npm install --save-dev mongodb-memory-server mongoose</code>
+    </div>
+
+    <span class="file-label">// models/Product.js</span>
+    <div class="code-block">
+      <pre><span class="kw">const</span> mongoose = <span class="fn">require</span>(<span class="str">'mongoose'</span>);
+
+<span class="kw">const</span> <span class="vr">productSchema</span> = <span class="kw">new</span> mongoose.<span class="fn">Schema</span>({
+  name:     { type: <span class="fl">String</span>, required: <span class="kw">true</span> },
+  slug:     { type: <span class="fl">String</span>, required: <span class="kw">true</span>, unique: <span class="kw">true</span> },
+  price:    { type: <span class="fl">Number</span>, required: <span class="kw">true</span>, min: <span class="num">0</span> },
+  inStock:  { type: <span class="fl">Boolean</span>, default: <span class="kw">true</span> },
+});
+
+module.exports = mongoose.<span class="fn">model</span>(<span class="str">'Product'</span>, <span class="vr">productSchema</span>);</pre>
+    </div>
+
+    <span class="file-label">// services/productService.js</span>
+    <div class="code-block">
+      <pre><span class="kw">const</span> Product = <span class="fn">require</span>(<span class="str">'../models/Product'</span>);
+
+<span class="kw">async function</span> <span class="fn">createProduct</span>(data) {
+  <span class="kw">const</span> <span class="vr">existing</span> = <span class="kw">await</span> Product.<span class="fn">findOne</span>({ slug: data.slug });
+  <span class="kw">if</span> (<span class="vr">existing</span>) <span class="kw">throw new</span> <span class="fn">Error</span>(<span class="str">'Slug already in use'</span>);
+  <span class="kw">return</span> Product.<span class="fn">create</span>(data);
+}
+
+<span class="kw">async function</span> <span class="fn">getAvailableProducts</span>() {
+  <span class="kw">return</span> Product.<span class="fn">find</span>({ inStock: <span class="kw">true</span> }).<span class="fn">lean</span>();
+}
+
+<span class="kw">async function</span> <span class="fn">discontinue</span>(slug) {
+  <span class="kw">const</span> <span class="vr">product</span> = <span class="kw">await</span> Product.<span class="fn">findOneAndUpdate</span>(
+    { slug },
+    { inStock: <span class="kw">false</span> },
+    { new: <span class="kw">true</span> }
+  );
+  <span class="kw">if</span> (!<span class="vr">product</span>) <span class="kw">throw new</span> <span class="fn">Error</span>(<span class="str">'Product not found'</span>);
+  <span class="kw">return</span> <span class="vr">product</span>;
+}
+
+module.exports = { createProduct, getAvailableProducts, discontinue };</pre>
+    </div>
+
+    <div class="ex-block">
+      <div class="ex-meta">
+        <span class="ex-title">🧩 Your task — write <code>productService.test.js</code></span>
+      </div>
+      <p style="font-size:13px;color:var(--color-text-secondary);line-height:1.65;margin-bottom:0.75rem;">Start with the
+        memory-server lifecycle hooks, then write the tests below.</p>
+      <ul class="task-list">
+        <li><span class="check"></span><span>Set up <code>beforeAll</code> / <code>afterEach</code> /
+            <code>afterAll</code> correctly using <code>MongoMemoryServer</code></span></li>
+        <li><span class="check"></span><span><strong>createProduct</strong> — happy path: product is created and
+            returned with the correct <code>name</code>, <code>slug</code>, and <code>inStock: true</code>
+            default</span></li>
+        <li><span class="check"></span><span><strong>createProduct</strong> — duplicate slug: throws
+            <code>'Slug already in use'</code></span></li>
+        <li><span class="check"></span><span><strong>createProduct</strong> — schema validation: a negative
+            <code>price</code> is rejected by Mongoose (<code>min: 0</code>)</span></li>
+        <li><span class="check"></span><span><strong>getAvailableProducts</strong> — returns only products where
+            <code>inStock</code> is <code>true</code>; products where <code>inStock: false</code> are excluded</span>
+        </li>
+        <li><span class="check"></span><span><strong>discontinue</strong> — sets <code>inStock</code> to
+            <code>false</code> and returns the updated product <span class="bonus-tag">bonus</span></span></li>
+        <li><span class="check"></span><span><strong>discontinue</strong> — throws <code>'Product not found'</code> for
+            an unknown slug <span class="bonus-tag">bonus</span></span></li>
+      </ul>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-label">💡 Hint — test isolation</div>
+      Each test should <code>await Product.deleteMany({})</code> in <code>afterEach</code> — not <code>afterAll</code>.
+      This keeps tests independent without restarting the server between every test.
+    </div>
+
+    <div class="callout callout-warn">
+      <div class="callout-label">⚠️ Schema validation errors</div>
+      Mongoose throws a <code>ValidationError</code>, not a plain <code>Error</code>. Match on the message text with
+      <code>.rejects.toThrow('min')</code> or check <code>err.name === 'ValidationError'</code> in a try/catch.
+    </div>
+    <div class="grid-2">
+      <div class="callout callout-tip" style="margin:0;">
+        <div class="callout-label">💡 Async rendering</div>
+        The component updates after the promise resolves — always wrap post-fetch assertions in
+        <code>await waitFor(...)</code> or use <code>await screen.findByText(...)</code>.
+      </div>
+
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Unit Testing — Session 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Fraunces:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --font-sans: 'Fraunces', Georgia, serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --color-background-primary: #ffffff;
+    --color-background-secondary: #f5f4f0;
+    --color-background-info: #E6F1FB;
+    --color-text-primary: #1a1a1a;
+    --color-text-secondary: #5a5a5a;
+    --color-text-info: #0C447C;
+    --color-border-tertiary: rgba(0,0,0,0.12);
+    --color-border-secondary: rgba(0,0,0,0.22);
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #faf9f6;
+    font-family: var(--font-sans);
+    color: var(--color-text-primary);
+    padding: 3rem 1.5rem 6rem;
+  }
+
+  .session { max-width: 720px; margin: 0 auto; }
+
+  .page-divider {
+    border: none;
+    border-top: 1.5px dashed #d4d0c8;
+    margin: 3.5rem 0;
+  }
+
+  /* ── badges ── */
+  .badge {
+    display: inline-block; font-size: 11px; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px; letter-spacing: 0.06em;
+    text-transform: uppercase; font-family: var(--font-mono);
+  }
+  .badge-session  { background: var(--color-background-info); color: var(--color-text-info); }
+  .badge-mock     { background: #FAECE7; color: #993C1D; }
+  .badge-async    { background: #EAF3DE; color: #3B6D11; }
+  .badge-hooks    { background: #EEEDFE; color: #3C3489; }
+  .badge-tdd      { background: #E1F5EE; color: #085041; }
+  .badge-bdd      { background: #FAEEDA; color: #633806; }
+  .badge-summary  { background: #F1EFE8; color: #5F5E5A; }
+  .badge-ref      { background: #fde8f5; color: #7a1a5e; }
+  .badge-green    { background: #EAF3DE; color: #3B6D11; }
+  .badge-purple   { background: #EEEDFE; color: #3C3489; }
+  .badge-amber    { background: #FAEEDA; color: #633806; }
+  .badge-red      { background: #FCEBEB; color: #791F1F; }
+
+  /* ── section headers ── */
+  .section-header {
+    display: flex; align-items: center; gap: 10px;
+    margin: 2.5rem 0 1rem; padding-bottom: 0.75rem;
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+  }
+  .section-title { font-size: 17px; font-weight: 600; color: var(--color-text-primary); }
+
+  /* ── cards ── */
+  .card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 1rem 1.25rem; margin-bottom: 0.75rem;
+  }
+  .card-title { font-size: 14px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 6px; }
+  .card-body  { font-size: 13px; color: var(--color-text-secondary); line-height: 1.65; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+  /* ── callout boxes ── */
+  .callout {
+    border-radius: var(--border-radius-md);
+    padding: 1rem 1.25rem; margin: 0.75rem 0;
+    font-size: 13px; line-height: 1.65;
+  }
+  .callout-label {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;
+  }
+  .callout-tip    { background: #EAF3DE; border-left: 3px solid #3B6D11; }
+  .callout-tip .callout-label { color: #3B6D11; }
+  .callout-warn   { background: #FAEEDA; border-left: 3px solid #c07000; }
+  .callout-warn .callout-label { color: #c07000; }
+  .callout-info   { background: var(--color-background-info); border-left: 3px solid #0C447C; }
+  .callout-info .callout-label { color: #0C447C; }
+
+  /* ── code blocks ── */
+  .code-block {
+    background: #1e1e2e; border-radius: var(--border-radius-md);
+    padding: 1rem 1.25rem; margin: 0.65rem 0; overflow-x: auto;
+    font-family: var(--font-mono); font-size: 12.5px; line-height: 1.75;
+  }
+  .code-block pre { color: #cdd6f4; white-space: pre; }
+  .kw  { color: #cba6f7; }
+  .fn  { color: #89b4fa; }
+  .str { color: #a6e3a1; }
+  .cm  { color: #6c7086; font-style: italic; }
+  .num { color: #fab387; }
+  .vr  { color: #f38ba8; }
+  .fl  { color: #89dceb; }
+  .file-label {
+    font-family: var(--font-mono); font-size: 11px; color: #6c7086;
+    display: block; margin-bottom: -4px;
+  }
+
+  /* ── lifecycle hook table ── */
+  .hook-table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; font-size: 13px; }
+  .hook-table th {
+    text-align: left; padding: 8px 12px; font-size: 11px; font-weight: 600;
+    font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--color-text-secondary); border-bottom: 1px solid var(--color-border-tertiary);
+    background: var(--color-background-secondary);
+  }
+  .hook-table td {
+    padding: 10px 12px; border-bottom: 0.5px solid var(--color-border-tertiary);
+    vertical-align: top; color: var(--color-text-secondary); line-height: 1.55;
+  }
+  .hook-table tr:last-child td { border-bottom: none; }
+  .hook-name {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+    color: var(--color-text-primary); white-space: nowrap;
+  }
+
+  /* ── compare table (TDD vs BDD) ── */
+  .compare-table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; font-size: 13px; }
+  .compare-table th {
+    padding: 10px 14px; font-size: 12px; font-weight: 600;
+    font-family: var(--font-mono); color: #fff; text-align: left;
+  }
+  .th-tdd { background: #085041; }
+  .th-bdd { background: #633806; }
+  .th-label { background: var(--color-background-secondary); color: var(--color-text-secondary) !important; font-size: 11px !important; }
+  .compare-table td {
+    padding: 10px 14px; border-bottom: 0.5px solid var(--color-border-tertiary);
+    vertical-align: top; color: var(--color-text-secondary); line-height: 1.55;
+  }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table .row-label {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    color: var(--color-text-primary); text-transform: uppercase; letter-spacing: 0.06em;
+  }
+
+  /* ── summary keyword pills ── */
+  .kw-grid { display: flex; flex-wrap: wrap; gap: 8px; margin: 0.75rem 0; }
+  .kw-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: 20px; padding: 5px 12px;
+    font-size: 12px; font-family: var(--font-mono);
+    color: var(--color-text-secondary);
+  }
+  .kw-pill .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── reference cards ── */
+  .ref-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 0.75rem 0; }
+  .ref-card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 1rem 1.1rem; text-decoration: none;
+    display: block; transition: border-color 0.15s;
+  }
+  .ref-card:hover { border-color: var(--color-border-secondary); }
+  .ref-type { font-size: 10px; font-family: var(--font-mono); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 5px; }
+  .ref-title { font-size: 13px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 4px; line-height: 1.3; }
+  .ref-desc  { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+  .ref-url   { font-size: 11px; font-family: var(--font-mono); color: #aaa; margin-top: 6px; word-break: break-all; }
+
+  code {
+    font-family: var(--font-mono); font-size: 11.5px;
+    background: var(--color-background-secondary);
+    padding: 1px 5px; border-radius: 4px;
+  }
+
+  /* ── page title bar ── */
+  .page-title-bar {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 2.5rem; padding-bottom: 1rem;
+    border-bottom: 2px solid var(--color-text-primary);
+  }
+  .page-title-bar .title {
+    font-size: 13px; font-weight: 600; font-family: var(--font-mono);
+    color: var(--color-text-secondary); letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .page-title-bar .dot { width: 8px; height: 8px; border-radius: 50%; background: #89b4fa; flex-shrink: 0; }
+
+  /* ── session intro ── */
+  .session-intro {
+    padding-bottom: 1.5rem;
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+    margin-bottom: 0.5rem;
+  }
+  .session-intro h1 { font-size: 32px; font-weight: 600; line-height: 1.2; color: var(--color-text-primary); margin: 10px 0 8px; }
+  .session-intro p  { font-size: 14px; color: var(--color-text-secondary); line-height: 1.65; }
+
+  /* ── table of contents ── */
+  .toc {
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-lg);
+    padding: 1.25rem 1.5rem; margin-bottom: 2.5rem;
+  }
+  .toc-title { font-size: 11px; font-weight: 600; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-text-secondary); margin-bottom: 10px; }
+  .toc-group { margin-bottom: 12px; }
+  .toc-group:last-child { margin-bottom: 0; }
+  .toc-group-label { font-size: 11px; font-weight: 600; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-primary); margin-bottom: 5px; }
+  .toc-sub { padding-left: 16px; }
+  .toc a { display: block; font-size: 13px; color: var(--color-text-secondary); text-decoration: none; padding: 3px 0; font-family: var(--font-mono); }
+  .toc a:hover { color: var(--color-text-primary); }
+  .toc a .toc-num { color: #89b4fa; margin-right: 8px; font-weight: 600; }
+
+  /* ── benefit rows ── */
+  .benefit-row {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 0; border-bottom: 0.5px solid var(--color-border-tertiary);
+  }
+  .benefit-row:last-child { border-bottom: none; }
+  .benefit-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .benefit-text { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+  .benefit-text strong { color: var(--color-text-primary); font-weight: 600; }
+
+  /* ── step rows ── */
+  .step-row { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .step-row:last-child { border-bottom: none; }
+  .step-num {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--color-background-secondary);
+    border: 0.5px solid var(--color-border-secondary);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; font-family: var(--font-mono);
+    color: var(--color-text-secondary); flex-shrink: 0;
+  }
+  .step-body .step-title { font-size: 14px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 3px; }
+  .step-body .step-desc  { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+</style>
+</head>
+<body>
+<div class="session">
+
+  <!-- page header -->
+  <div class="page-title-bar">
+    <div class="dot"></div>
+    <span class="title">JavaScript · Unit Testing · Session 2</span>
+  </div>
+
+  <!-- table of contents -->
+  <div class="toc">
+    <div class="toc-title">Contents</div>
+    <div class="toc-group">
+      <div class="toc-group-label">Topics</div>
+      <div class="toc-sub">
+        <a href="#hooks"><span class="toc-num">01</span>Lifecycle hooks — before / after</a>
+        <a href="#mocking-fns"><span class="toc-num">02</span>Mocking functions inside functions</a>
+        <a href="#mocking-db"><span class="toc-num">03</span>Mocking a database</a>
+        <a href="#mocking-mongo" style="padding-left:28px;font-size:12px;">↳ MongoDB with mongodb-memory-server</a>
+        <a href="#async"><span class="toc-num">04</span>Testing async functions</a>
+        <a href="#tdd-bdd"><span class="toc-num">05</span>TDD vs BDD</a>
+      </div>
+    </div>
+    <div class="toc-group">
+      <div class="toc-group-label">Session wrap-up</div>
+      <div class="toc-sub">
+        <a href="#summary"><span class="toc-num">06</span>Keywords, tools &amp; tech summary</a>
+        <a href="#references"><span class="toc-num">07</span>References &amp; further reading</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- intro -->
+  <div class="session-intro">
+    <span class="badge badge-session">Session 2 of 2</span>
+    <h1>Mocking, Async &amp;<br>Testing Strategies</h1>
+    <p>Going deeper — how to isolate dependencies, handle async code, and choose the right testing mindset for your team.</p>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════
+       01 — LIFECYCLE HOOKS
+  ═══════════════════════════════════════ -->
+  <div id="hooks" class="section-header">
+    <span class="badge badge-hooks">01</span>
+    <span class="section-title">Lifecycle hooks — before &amp; after</span>
+  </div>
+
+  <p style="font-size:13px;color:var(--color-text-secondary);line-height:1.65;margin-bottom:1rem;">
+    Jest gives you four hooks to run code <strong>around</strong> your tests — so you don't repeat setup and teardown logic in every single test.
+  </p>
+
+  <table class="hook-table">
+    <thead>
+      <tr>
+        <th>Hook</th>
+        <th>When it runs</th>
+        <th>Typical use</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="hook-name">beforeAll()</span></td>
+        <td>Once before <em>all</em> tests in the file/block</td>
+        <td>Start a DB connection, spin up a server, load a large fixture</td>
+      </tr>
+      <tr>
+        <td><span class="hook-name">afterAll()</span></td>
+        <td>Once after <em>all</em> tests finish</td>
+        <td>Close DB connection, delete temp files, stop the server</td>
+      </tr>
+      <tr>
+        <td><span class="hook-name">beforeEach()</span></td>
+        <td>Before <em>every</em> individual test</td>
+        <td>Reset state, seed fresh data, clear mocks so tests don't bleed into each other</td>
+      </tr>
+      <tr>
+        <td><span class="hook-name">afterEach()</span></td>
+        <td>After <em>every</em> individual test</td>
+        <td>Clean up side effects, restore mocks, remove test records</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-warn">
+    <div class="callout-label">⚠ Common mistake</div>
+    Using <code>beforeAll</code> to set up shared <em>mutable</em> state — if one test changes it, the next test inherits a broken state. Use <code>beforeEach</code> to get a fresh copy every time.
+  </div>
+
+  <span class="file-label">// hooks.test.js — full lifecycle example</span>
+  <div class="code-block"><pre><span class="kw">const</span> { <span class="vr">createUser</span>, <span class="vr">deleteUser</span>, <span class="vr">getUser</span> } = <span class="fn">require</span>(<span class="str">'./userService'</span>);
+
+<span class="kw">let</span> <span class="vr">testUserId</span>;
+
+<span class="cm">// Runs ONCE before all tests in this file</span>
+<span class="fn">beforeAll</span>(<span class="kw">async</span> () => {
+  <span class="kw">await</span> db.<span class="fn">connect</span>(); <span class="cm">// open connection once</span>
+});
+
+<span class="cm">// Runs ONCE after all tests finish</span>
+<span class="fn">afterAll</span>(<span class="kw">async</span> () => {
+  <span class="kw">await</span> db.<span class="fn">disconnect</span>(); <span class="cm">// close connection once</span>
+});
+
+<span class="cm">// Runs before EVERY test — fresh state each time</span>
+<span class="fn">beforeEach</span>(<span class="kw">async</span> () => {
+  <span class="vr">testUserId</span> = <span class="kw">await</span> <span class="fn">createUser</span>({ name: <span class="str">'Test User'</span>, email: <span class="str">'test@test.com'</span> });
+});
+
+<span class="cm">// Runs after EVERY test — clean up so tests don't interfere</span>
+<span class="fn">afterEach</span>(<span class="kw">async</span> () => {
+  <span class="kw">await</span> <span class="fn">deleteUser</span>(<span class="vr">testUserId</span>);
+});
+
+<span class="fn">describe</span>(<span class="str">'user service'</span>, () => {
+
+  <span class="fn">test</span>(<span class="str">'getUser returns the correct user'</span>, <span class="kw">async</span> () => {
+    <span class="kw">const</span> <span class="vr">user</span> = <span class="kw">await</span> <span class="fn">getUser</span>(<span class="vr">testUserId</span>);
+    <span class="fn">expect</span>(<span class="vr">user</span>.name).<span class="fn">toBe</span>(<span class="str">'Test User'</span>);
+  });
+
+  <span class="fn">test</span>(<span class="str">'getUser throws for unknown id'</span>, <span class="kw">async</span> () => {
+    <span class="kw">await</span> <span class="fn">expect</span>(<span class="fn">getUser</span>(<span class="str">'nonexistent'</span>)).<span class="fn">rejects</span>.<span class="fn">toThrow</span>(<span class="str">'User not found'</span>);
+  });
+
+});</pre></div>
+
+  <div class="callout callout-tip">
+    <div class="callout-label">💡 Scoping tip</div>
+    Hooks inside a <code>describe()</code> block only apply to tests <em>inside</em> that block. You can nest describe blocks with their own hooks for fine-grained control.
+  </div>
+
+
+  <!-- ═══════════════════════════════════════
+       02 — MOCKING FUNCTIONS INSIDE FUNCTIONS
+  ═══════════════════════════════════════ -->
+  <div id="mocking-fns" class="section-header">
+    <span class="badge badge-mock">02</span>
+    <span class="section-title">Mocking functions inside functions</span>
+  </div>
+
+  <p style="font-size:13px;color:var(--color-text-secondary);line-height:1.65;margin-bottom:0.75rem;">
+    A <strong>mock</strong> is a fake version of a function that you control completely. Instead of calling the real thing (sending an email, charging a card), you replace it with a pretend version that just records what happened.
+  </p>
+
+  <div class="grid-2" style="margin-bottom:1rem;">
+    <div class="card">
+      <div class="card-title">Why mock?</div>
+      <div class="card-body">The real function is slow, expensive, unpredictable, or has side effects (email, payment, file system) — you want to test <em>your</em> code logic, not the external service.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">What can you verify?</div>
+      <div class="card-body">Was the function called? How many times? With which arguments? What did it return? All without it actually doing anything real.</div>
+    </div>
+  </div>
+
+  <span class="file-label">// emailService.js — the function our code depends on</span>
+  <div class="code-block"><pre><span class="kw">async function</span> <span class="fn">sendWelcomeEmail</span>(email) {
+  <span class="cm">// sends a real email — we do NOT want this in tests</span>
+  <span class="kw">await</span> mailer.<span class="fn">send</span>({ to: email, subject: <span class="str">'Welcome!'</span> });
+}
+
+module.exports = { sendWelcomeEmail };</pre></div>
+
+  <span class="file-label">// userController.js — the function we want to test</span>
+  <div class="code-block"><pre><span class="kw">const</span> { <span class="vr">sendWelcomeEmail</span> } = <span class="fn">require</span>(<span class="str">'./emailService'</span>);
+
+<span class="kw">async function</span> <span class="fn">registerUser</span>(userData) {
+  <span class="kw">const</span> <span class="vr">user</span> = <span class="kw">await</span> db.<span class="fn">save</span>(<span class="vr">userData</span>);
+  <span class="kw">await</span> <span class="fn">sendWelcomeEmail</span>(<span class="vr">userData</span>.email); <span class="cm">// ← we want to mock this</span>
+  <span class="kw">return</span> <span class="vr">user</span>;
+}
+
+module.exports = { registerUser };</pre></div>
+
+  <span class="file-label">// userController.test.js</span>
+  <div class="code-block"><pre><span class="cm">// Tell Jest to auto-mock the entire module</span>
+jest.<span class="fn">mock</span>(<span class="str">'./emailService'</span>);
+
+<span class="kw">const</span> { <span class="vr">registerUser</span> }    = <span class="fn">require</span>(<span class="str">'./userController'</span>);
+<span class="kw">const</span> { <span class="vr">sendWelcomeEmail</span> } = <span class="fn">require</span>(<span class="str">'./emailService'</span>);
+
+<span class="fn">beforeEach</span>(() => {
+  jest.<span class="fn">clearAllMocks</span>(); <span class="cm">// reset call history before each test</span>
+});
+
+<span class="fn">describe</span>(<span class="str">'registerUser'</span>, () => {
+
+  <span class="fn">test</span>(<span class="str">'sends a welcome email after registration'</span>, <span class="kw">async</span> () => {
+    <span class="kw">await</span> <span class="fn">registerUser</span>({ name: <span class="str">'Sara'</span>, email: <span class="str">'sara@test.com'</span> });
+
+    <span class="cm">// Was sendWelcomeEmail called?</span>
+    <span class="fn">expect</span>(<span class="vr">sendWelcomeEmail</span>).<span class="fn">toHaveBeenCalledTimes</span>(<span class="num">1</span>);
+
+    <span class="cm">// Was it called with the right email?</span>
+    <span class="fn">expect</span>(<span class="vr">sendWelcomeEmail</span>).<span class="fn">toHaveBeenCalledWith</span>(<span class="str">'sara@test.com'</span>);
+  });
+
+  <span class="fn">test</span>(<span class="str">'does not send email if registration fails'</span>, <span class="kw">async</span> () => {
+    db.save.<span class="fn">mockRejectedValueOnce</span>(<span class="kw">new</span> <span class="fn">Error</span>(<span class="str">'DB error'</span>));
+
+    <span class="kw">await</span> <span class="fn">expect</span>(<span class="fn">registerUser</span>({ name: <span class="str">'X'</span>, email: <span class="str">'x@test.com'</span> }))
+      .<span class="fn">rejects</span>.<span class="fn">toThrow</span>(<span class="str">'DB error'</span>);
+
+    <span class="fn">expect</span>(<span class="vr">sendWelcomeEmail</span>).<span class="fn">not</span>.<span class="fn">toHaveBeenCalled</span>();
+  });
+
+});</pre></div>
+
+  <div class="callout callout-info">
+    <div class="callout-label">ℹ Key mock matchers</div>
+    <code>toHaveBeenCalled()</code> · <code>toHaveBeenCalledTimes(n)</code> · <code>toHaveBeenCalledWith(...args)</code> · <code>not.toHaveBeenCalled()</code>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════
+       03 — MOCKING A DATABASE
+  ═══════════════════════════════════════ -->
+  <div id="mocking-db" class="section-header">
+    <span class="badge badge-mock">03</span>
+    <span class="section-title">Mocking a database</span>
+  </div>
+
+  <p style="font-size:13px;color:var(--color-text-secondary);line-height:1.65;margin-bottom:0.75rem;">
+    Unit tests should <strong>never</strong> touch a real database. A DB connection is slow, requires setup, and leaves dirty data. Instead, mock the DB layer so your test controls exactly what data comes back.
+  </p>
+
+  <div class="callout callout-tip">
+    <div class="callout-label">💡 Pattern to follow</div>
+    Keep your DB calls in a separate module (e.g. <code>userRepository.js</code>). Your service only calls the repository — making it trivial to mock the repository in tests without touching the service logic.
+  </div>
+
+  <span class="file-label">// userRepository.js — the DB layer</span>
+  <div class="code-block"><pre><span class="kw">const</span> db = <span class="fn">require</span>(<span class="str">'./db'</span>);
+
+<span class="kw">async function</span> <span class="fn">findUserById</span>(id) {
+  <span class="kw">return</span> db.<span class="fn">query</span>(<span class="str">`SELECT * FROM users WHERE id = ?`</span>, [id]);
+}
+
+<span class="kw">async function</span> <span class="fn">saveUser</span>(data) {
+  <span class="kw">return</span> db.<span class="fn">query</span>(<span class="str">`INSERT INTO users SET ?`</span>, [data]);
+}
+
+module.exports = { findUserById, saveUser };</pre></div>
+
+  <span class="file-label">// userService.js — the business logic layer</span>
+  <div class="code-block"><pre><span class="kw">const</span> repo = <span class="fn">require</span>(<span class="str">'./userRepository'</span>);
+
+<span class="kw">async function</span> <span class="fn">getUserProfile</span>(id) {
+  <span class="kw">const</span> <span class="vr">user</span> = <span class="kw">await</span> repo.<span class="fn">findUserById</span>(id);
+  <span class="kw">if</span> (!<span class="vr">user</span>) <span class="kw">throw new</span> <span class="fn">Error</span>(<span class="str">'User not found'</span>);
+  <span class="kw">return</span> { id: <span class="vr">user</span>.id, name: <span class="vr">user</span>.name, email: <span class="vr">user</span>.email };
+}
+
+module.exports = { getUserProfile };</pre></div>
+
+  <span class="file-label">// userService.test.js — mock the whole DB layer</span>
+  <div class="code-block"><pre><span class="cm">// Mock the entire repository module</span>
+jest.<span class="fn">mock</span>(<span class="str">'./userRepository'</span>);
+
+<span class="kw">const</span> { <span class="vr">getUserProfile</span> }  = <span class="fn">require</span>(<span class="str">'./userService'</span>);
+<span class="kw">const</span> repo                 = <span class="fn">require</span>(<span class="str">'./userRepository'</span>);
+
+<span class="fn">describe</span>(<span class="str">'getUserProfile'</span>, () => {
+
+  <span class="fn">test</span>(<span class="str">'returns formatted user when found'</span>, <span class="kw">async</span> () => {
+    <span class="cm">// Tell the mock what to return</span>
+    repo.findUserById.<span class="fn">mockResolvedValue</span>({
+      id: <span class="num">1</span>, name: <span class="str">'Sara Ahmed'</span>, email: <span class="str">'sara@test.com'</span>, password: <span class="str">'secret'</span>
+    });
+
+    <span class="kw">const</span> <span class="vr">profile</span> = <span class="kw">await</span> <span class="fn">getUserProfile</span>(<span class="num">1</span>);
+
+    <span class="fn">expect</span>(<span class="vr">profile</span>).<span class="fn">toEqual</span>({
+      id: <span class="num">1</span>, name: <span class="str">'Sara Ahmed'</span>, email: <span class="str">'sara@test.com'</span>
+      <span class="cm">// password is NOT exposed — our service strips it</span>
+    });
+  });
+
+  <span class="fn">test</span>(<span class="str">'throws when user does not exist'</span>, <span class="kw">async</span> () => {
+    repo.findUserById.<span class="fn">mockResolvedValue</span>(<span class="kw">null</span>); <span class="cm">// DB returns nothing</span>
+
+    <span class="kw">await</span> <span class="fn">expect</span>(<span class="fn">getUserProfile</span>(<span class="num">999</span>))
+      .<span class="fn">rejects</span>.<span class="fn">toThrow</span>(<span class="str">'User not found'</span>);
+  });
+
+  <span class="fn">test</span>(<span class="str">'throws when DB itself fails'</span>, <span class="kw">async</span> () => {
+    repo.findUserById.<span class="fn">mockRejectedValue</span>(<span class="kw">new</span> <span class="fn">Error</span>(<span class="str">'Connection lost'</span>));
+
+    <span class="kw">await</span> <span class="fn">expect</span>(<span class="fn">getUserProfile</span>(<span class="num">1</span>))
+      .<span class="fn">rejects</span>.<span class="fn">toThrow</span>(<span class="str">'Connection lost'</span>);
+  });
+
+});</pre></div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><code>mockResolvedValue(x)</code></div>
+      <div class="card-body">Make the mock return a resolved Promise with value <code>x</code>. Use for simulating a successful DB response.</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><code>mockRejectedValue(err)</code></div>
+      <div class="card-body">Make the mock return a rejected Promise. Use to simulate a DB error or network failure.</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><code>mockResolvedValueOnce(x)</code></div>
+      <div class="card-body">Like <code>mockResolvedValue</code> but only for the <em>next</em> call. Useful when the same mock needs different responses in sequence.</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><code>mockReturnValue(x)</code></div>
+      <div class="card-body">Synchronous version — makes the mock return <code>x</code> directly (not a Promise). Use for non-async fakes.</div>
+    </div>
+  </div>
+
+
+  <!-- ─────────────────────────────────────
+       03b — MONGODB WITH MEMORY SERVER
+  ───────────────────────────────────────── -->
+  <div id="mocking-mongo" style="margin-top:2rem;">
+    <p style="font-size:13px;font-weight:600;color:var(--color-text-primary);margin-bottom:0.5rem;">MongoDB with <code>mongodb-memory-server</code></p>
+    <p style="font-size:13px;color:var(--color-text-secondary);line-height:1.65;margin-bottom:0.75rem;">
+      When your app uses Mongoose, <code>jest.mock</code> the model works for pure unit tests — but sometimes you want to test the full Mongoose query logic (validators, hooks, transforms) without a real server.
+      <strong>mongodb-memory-server</strong> spins up a real MongoDB instance in memory. It starts in <code>beforeAll</code>, is wiped in <code>afterEach</code>, and is torn down in <code>afterAll</code>. No Docker. No external process.
+    </p>
+
+    <div class="callout callout-info">
+      <div class="callout-label">📦 Install</div>
+      <code>npm install --save-dev mongodb-memory-server mongoose</code><br>
+      <span style="font-size:12px;color:var(--color-text-secondary);">Add <code>"@mongodbjs/mongodb-memory-server": { "version": "latest" }</code> in package.json under <code>"config"</code> if you want a pinned binary.</span>
+    </div>
+
+    <span class="file-label">// models/User.js — a simple Mongoose model</span>
+    <div class="code-block"><pre><span class="kw">const</span> mongoose = <span class="fn">require</span>(<span class="str">'mongoose'</span>);
+
+<span class="kw">const</span> <span class="vr">userSchema</span> = <span class="kw">new</span> mongoose.<span class="fn">Schema</span>({
+  name:  { type: <span class="fl">String</span>, required: <span class="kw">true</span> },
+  email: { type: <span class="fl">String</span>, required: <span class="kw">true</span>, unique: <span class="kw">true</span> },
+  role:  { type: <span class="fl">String</span>, default: <span class="str">'viewer'</span> },
+});
+
+module.exports = mongoose.<span class="fn">model</span>(<span class="str">'User'</span>, <span class="vr">userSchema</span>);</pre></div>
+
+    <span class="file-label">// services/userService.js — calls the model directly</span>
+    <div class="code-block"><pre><span class="kw">const</span> User = <span class="fn">require</span>(<span class="str">'../models/User'</span>);
+
+<span class="kw">async function</span> <span class="fn">getUserProfile</span>(id) {
+  <span class="kw">const</span> <span class="vr">user</span> = <span class="kw">await</span> User.<span class="fn">findById</span>(id).<span class="fn">lean</span>();
+  <span class="kw">if</span> (!<span class="vr">user</span>) <span class="kw">throw new</span> <span class="fn">Error</span>(<span class="str">'User not found'</span>);
+  <span class="kw">return</span> { id: <span class="vr">user</span>._id, name: <span class="vr">user</span>.name, email: <span class="vr">user</span>.email };
+}
+
+<span class="kw">async function</span> <span class="fn">registerUser</span>(data) {
+  <span class="kw">const</span> <span class="vr">existing</span> = <span class="kw">await</span> User.<span class="fn">findOne</span>({ email: data.email });
+  <span class="kw">if</span> (<span class="vr">existing</span>) <span class="kw">throw new</span> <span class="fn">Error</span>(<span class="str">'Email already in use'</span>);
+  <span class="kw">return</span> User.<span class="fn">create</span>({ name: data.name, email: data.email });
+}
+
+module.exports = { getUserProfile, registerUser };</pre></div>
+
+    <span class="file-label">// tests/userService.mongo.test.js — full memory-server setup</span>
+    <div class="code-block"><pre><span class="kw">const</span> { MongoMemoryServer } = <span class="fn">require</span>(<span class="str">'mongodb-memory-server'</span>);
+<span class="kw">const</span> mongoose              = <span class="fn">require</span>(<span class="str">'mongoose'</span>);
+<span class="kw">const</span> User                  = <span class="fn">require</span>(<span class="str">'../models/User'</span>);
+<span class="kw">const</span> { getUserProfile, registerUser } = <span class="fn">require</span>(<span class="str">'../services/userService'</span>);
+
+<span class="kw">let</span> <span class="vr">mongoServer</span>;
+
+<span class="cm">// ── Setup ──────────────────────────────────────────────────────────</span>
+<span class="fn">beforeAll</span>(<span class="kw">async</span> () => {
+  <span class="vr">mongoServer</span> = <span class="kw">await</span> MongoMemoryServer.<span class="fn">create</span>();           <span class="cm">// start in-memory instance</span>
+  <span class="kw">await</span> mongoose.<span class="fn">connect</span>(<span class="vr">mongoServer</span>.<span class="fn">getUri</span>());            <span class="cm">// connect Mongoose to it</span>
+});
+
+<span class="fn">afterEach</span>(<span class="kw">async</span> () => {
+  <span class="kw">await</span> User.<span class="fn">deleteMany</span>({});                               <span class="cm">// wipe between tests</span>
+});
+
+<span class="fn">afterAll</span>(<span class="kw">async</span> () => {
+  <span class="kw">await</span> mongoose.<span class="fn">disconnect</span>();
+  <span class="kw">await</span> <span class="vr">mongoServer</span>.<span class="fn">stop</span>();                               <span class="cm">// tear down the server</span>
+});
+
+<span class="cm">// ── Tests ──────────────────────────────────────────────────────────</span>
+<span class="fn">describe</span>(<span class="str">'getUserProfile'</span>, () => {
+
+  <span class="fn">test</span>(<span class="str">'returns profile for an existing user'</span>, <span class="kw">async</span> () => {
+    <span class="cm">// Arrange — insert directly via the model</span>
+    <span class="kw">const</span> <span class="vr">created</span> = <span class="kw">await</span> User.<span class="fn">create</span>({ name: <span class="str">'Sara Ahmed'</span>, email: <span class="str">'sara@test.com'</span> });
+
+    <span class="cm">// Act</span>
+    <span class="kw">const</span> <span class="vr">profile</span> = <span class="kw">await</span> <span class="fn">getUserProfile</span>(<span class="vr">created</span>._id);
+
+    <span class="cm">// Assert</span>
+    <span class="fn">expect</span>(<span class="vr">profile</span>.name).<span class="fn">toBe</span>(<span class="str">'Sara Ahmed'</span>);
+    <span class="fn">expect</span>(<span class="vr">profile</span>.email).<span class="fn">toBe</span>(<span class="str">'sara@test.com'</span>);
+  });
+
+  <span class="fn">test</span>(<span class="str">'throws when user does not exist'</span>, <span class="kw">async</span> () => {
+    <span class="kw">const</span> <span class="vr">fakeId</span> = <span class="kw">new</span> mongoose.Types.<span class="fn">ObjectId</span>();
+    <span class="kw">await</span> <span class="fn">expect</span>(<span class="fn">getUserProfile</span>(<span class="vr">fakeId</span>)).<span class="fn">rejects</span>.<span class="fn">toThrow</span>(<span class="str">'User not found'</span>);
+  });
+
+});
+
+<span class="fn">describe</span>(<span class="str">'registerUser'</span>, () => {
+
+  <span class="fn">test</span>(<span class="str">'creates and returns a new user'</span>, <span class="kw">async</span> () => {
+    <span class="kw">const</span> <span class="vr">user</span> = <span class="kw">await</span> <span class="fn">registerUser</span>({ name: <span class="str">'Karim Nour'</span>, email: <span class="str">'karim@test.com'</span> });
+    <span class="fn">expect</span>(<span class="vr">user</span>.email).<span class="fn">toBe</span>(<span class="str">'karim@test.com'</span>);
+    <span class="fn">expect</span>(<span class="vr">user</span>.role).<span class="fn">toBe</span>(<span class="str">'viewer'</span>);                       <span class="cm">// default from schema</span>
+  });
+
+  <span class="fn">test</span>(<span class="str">'throws on duplicate email'</span>, <span class="kw">async</span> () => {
+    <span class="kw">await</span> User.<span class="fn">create</span>({ name: <span class="str">'Karim Nour'</span>, email: <span class="str">'karim@test.com'</span> });
+    <span class="kw">await</span> <span class="fn">expect</span>(<span class="fn">registerUser</span>({ name: <span class="str">'Other'</span>, email: <span class="str">'karim@test.com'</span> }))
+      .<span class="fn">rejects</span>.<span class="fn">toThrow</span>(<span class="str">'Email already in use'</span>);
+  });
+
+  <span class="fn">test</span>(<span class="str">'enforces required fields via schema validation'</span>, <span class="kw">async</span> () => {
+    <span class="cm">// name is required — Mongoose throws a ValidationError</span>
+    <span class="kw">await</span> <span class="fn">expect</span>(User.<span class="fn">create</span>({ email: <span class="str">'no-name@test.com'</span> }))
+      .<span class="fn">rejects</span>.<span class="fn">toThrow</span>(<span class="str">'Path `name` is required'</span>);
+  });
+
+});</pre></div>
+
+    <div class="callout callout-warn">
+      <div class="callout-label">⚠️ This is an integration test, not a unit test</div>
+      <code>mongodb-memory-server</code> runs real Mongoose queries — so you're testing the full stack from service → model → DB engine. Use it when you specifically want to test schema validation, indexes, or query logic. For testing pure business logic, keep mocking the repository instead.
+    </div>
+
+    <div class="grid-2" style="margin-top:0.75rem;">
+      <div class="card">
+        <div class="card-title">Unit test (mock the repo)</div>
+        <div class="card-body">Fast, isolated, no I/O. Test only your service logic. The repo is a Jest mock — the DB is never touched.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Integration test (memory server)</div>
+        <div class="card-body">Slower, but tests real queries, schema validators, unique indexes, and Mongoose middleware like <code>pre('save')</code>.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       04 — TESTING ASYNC FUNCTIONS
+  ═══════════════════════════════════════ -->
+  <div id="async" class="section-header">
+    <span class="badge badge-async">04</span>
+    <span class="section-title">Testing async functions</span>
+  </div>
+
+  <p style="font-size:13px;color:var(--color-text-secondary);line-height:1.65;margin-bottom:0.75rem;">
+    Real-world code is full of Promises — API calls, DB queries, timers. Jest needs to <em>wait</em> for them to finish. There are three ways to do it.
+  </p>
+
+  <div class="card" style="margin-bottom:0.5rem;">
+    <div class="card-title">Pattern 1 — async / await (recommended)</div>
+    <div class="card-body">The cleanest approach. Make the test function <code>async</code>, then <code>await</code> the call. Jest waits automatically.</div>
+  </div>
+  <div class="code-block"><pre><span class="fn">test</span>(<span class="str">'fetches user successfully'</span>, <span class="kw">async</span> () => {
+  <span class="kw">const</span> <span class="vr">user</span> = <span class="kw">await</span> <span class="fn">fetchUser</span>(<span class="num">1</span>);
+  <span class="fn">expect</span>(<span class="vr">user</span>.name).<span class="fn">toBe</span>(<span class="str">'Sara'</span>);
+});</pre></div>
+
+  <div class="card" style="margin-bottom:0.5rem;">
+    <div class="card-title">Pattern 2 — return the Promise</div>
+    <div class="card-body">Return the Promise from the test. Jest will wait for it to resolve or reject. Older style, still valid.</div>
+  </div>
+  <div class="code-block"><pre><span class="fn">test</span>(<span class="str">'fetches user successfully'</span>, () => {
+  <span class="kw">return</span> <span class="fn">fetchUser</span>(<span class="num">1</span>).<span class="fn">then</span>(user => {
+    <span class="fn">expect</span>(user.name).<span class="fn">toBe</span>(<span class="str">'Sara'</span>);
+  });
+});</pre></div>
+
+  <div class="card" style="margin-bottom:0.5rem;">
+    <div class="card-title">Testing for rejections (errors)</div>
+    <div class="card-body">Two clean ways to assert that an async function throws.</div>
+  </div>
+  <div class="code-block"><pre><span class="cm">// Option A — await + rejects</span>
+<span class="fn">test</span>(<span class="str">'throws on invalid id'</span>, <span class="kw">async</span> () => {
+  <span class="kw">await</span> <span class="fn">expect</span>(<span class="fn">fetchUser</span>(-<span class="num">1</span>)).<span class="fn">rejects</span>.<span class="fn">toThrow</span>(<span class="str">'Invalid id'</span>);
+});
+
+<span class="cm">// Option B — try / catch</span>
+<span class="fn">test</span>(<span class="str">'throws on invalid id'</span>, <span class="kw">async</span> () => {
+  <span class="kw">try</span> {
+    <span class="kw">await</span> <span class="fn">fetchUser</span>(-<span class="num">1</span>);
+  } <span class="kw">catch</span> (err) {
+    <span class="fn">expect</span>(err.message).<span class="fn">toBe</span>(<span class="str">'Invalid id'</span>);
+  }
+});</pre></div>
+
+  <div class="callout callout-warn">
+    <div class="callout-label">⚠ Common async mistake</div>
+    Forgetting <code>await</code> — the test finishes before the Promise resolves, so it <strong>passes even when it should fail</strong>. Always use <code>async/await</code> or <code>return</code> when testing Promises.
+  </div>
+
+  <p style="font-size:13px;color:var(--color-text-secondary);margin:1rem 0 0.5rem;font-weight:600;">Full realistic example — fetching from an API</p>
+  <span class="file-label">// api.js</span>
+  <div class="code-block"><pre><span class="kw">const</span> axios = <span class="fn">require</span>(<span class="str">'axios'</span>);
+
+<span class="kw">async function</span> <span class="fn">fetchPost</span>(id) {
+  <span class="kw">const</span> { <span class="vr">data</span> } = <span class="kw">await</span> axios.<span class="fn">get</span>(<span class="str">`https://jsonplaceholder.typicode.com/posts/${id}`</span>);
+  <span class="kw">return</span> { id: <span class="vr">data</span>.id, title: <span class="vr">data</span>.title };
+}
+
+module.exports = { fetchPost };</pre></div>
+
+  <span class="file-label">// api.test.js — mock axios so no real HTTP request fires</span>
+  <div class="code-block"><pre>jest.<span class="fn">mock</span>(<span class="str">'axios'</span>);
+
+<span class="kw">const</span> axios          = <span class="fn">require</span>(<span class="str">'axios'</span>);
+<span class="kw">const</span> { <span class="vr">fetchPost</span> } = <span class="fn">require</span>(<span class="str">'./api'</span>);
+
+<span class="fn">describe</span>(<span class="str">'fetchPost'</span>, () => {
+
+  <span class="fn">test</span>(<span class="str">'returns formatted post on success'</span>, <span class="kw">async</span> () => {
+    axios.get.<span class="fn">mockResolvedValue</span>({
+      data: { id: <span class="num">1</span>, title: <span class="str">'Hello World'</span>, body: <span class="str">'...'</span>, userId: <span class="num">1</span> }
+    });
+
+    <span class="kw">const</span> <span class="vr">post</span> = <span class="kw">await</span> <span class="fn">fetchPost</span>(<span class="num">1</span>);
+
+    <span class="fn">expect</span>(<span class="vr">post</span>).<span class="fn">toEqual</span>({ id: <span class="num">1</span>, title: <span class="str">'Hello World'</span> });
+    <span class="fn">expect</span>(axios.get).<span class="fn">toHaveBeenCalledWith</span>(
+      <span class="str">'https://jsonplaceholder.typicode.com/posts/1'</span>
+    );
+  });
+
+  <span class="fn">test</span>(<span class="str">'throws when API call fails'</span>, <span class="kw">async</span> () => {
+    axios.get.<span class="fn">mockRejectedValue</span>(<span class="kw">new</span> <span class="fn">Error</span>(<span class="str">'Network Error'</span>));
+
+    <span class="kw">await</span> <span class="fn">expect</span>(<span class="fn">fetchPost</span>(<span class="num">1</span>)).<span class="fn">rejects</span>.<span class="fn">toThrow</span>(<span class="str">'Network Error'</span>);
+  });
+
+});</pre></div>
+
+
+  <!-- ═══════════════════════════════════════
+       05 — TDD VS BDD
+  ═══════════════════════════════════════ -->
+  <div id="tdd-bdd" class="section-header">
+    <span class="badge badge-tdd">05</span>
+    <span class="section-title">TDD vs BDD</span>
+  </div>
+
+  <p style="font-size:13px;color:var(--color-text-secondary);line-height:1.65;margin-bottom:1rem;">
+    Both are <strong>workflows</strong>, not libraries. They describe <em>when</em> you write tests and <em>how</em> you think about them — not which tool you use.
+  </p>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th class="th-label" style="width:22%;">Aspect</th>
+        <th class="th-tdd">TDD — Test-Driven Development</th>
+        <th class="th-bdd">BDD — Behaviour-Driven Development</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="row-label">Core idea</td>
+        <td>Write the test first, then write just enough code to make it pass.</td>
+        <td>Write tests that describe <em>behaviour</em> in plain language, from the user's point of view.</td>
+      </tr>
+      <tr>
+        <td class="row-label">Cycle</td>
+        <td><strong>Red → Green → Refactor.</strong> Write a failing test. Make it pass. Clean up.</td>
+        <td><strong>Given → When → Then.</strong> Given a context, when an action happens, then expect an outcome.</td>
+      </tr>
+      <tr>
+        <td class="row-label">Who writes</td>
+        <td>Developers</td>
+        <td>Developers + QA + Product — tests become shared documentation</td>
+      </tr>
+      <tr>
+        <td class="row-label">Language</td>
+        <td>Technical — function names, input/output</td>
+        <td>Plain English — readable by non-developers</td>
+      </tr>
+      <tr>
+        <td class="row-label">Jest example</td>
+        <td><code>test('returns 80 for 20% off 100', ...)</code></td>
+        <td><code>it('should apply the discount to the price', ...)</code></td>
+      </tr>
+      <tr>
+        <td class="row-label">Best for</td>
+        <td>Library code, utilities, pure functions</td>
+        <td>Features, user stories, APIs with clear business rules</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p style="font-size:13px;font-weight:600;color:var(--color-text-primary);margin:1.25rem 0 0.5rem;">TDD in practice — Red → Green → Refactor</p>
+
+  <div class="card" style="padding:0.25rem 1.25rem;">
+    <div class="step-row">
+      <div class="step-num" style="background:#FCEBEB;color:#791F1F;border-color:#f0b4b4;">🔴</div>
+      <div class="step-body">
+        <div class="step-title">Red — write a failing test first</div>
+        <div class="step-desc">The function doesn't exist yet. The test will fail — that's the point. It defines what you need to build.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num" style="background:#EAF3DE;color:#3B6D11;border-color:#a8d98a;">🟢</div>
+      <div class="step-body">
+        <div class="step-title">Green — write the minimum code to pass</div>
+        <div class="step-desc">Don't over-engineer. Write just enough code to make the test pass — even if it's ugly.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num" style="background:#E6F1FB;color:#0C447C;border-color:#8bbde8;">🔵</div>
+      <div class="step-body">
+        <div class="step-title">Refactor — clean up with confidence</div>
+        <div class="step-desc">Improve the code — rename, restructure, optimise. The test is your safety net. If it still passes, you didn't break anything.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-block" style="margin-top:0.75rem;"><pre><span class="cm">// BDD style — the describe/it structure reads like a spec</span>
+<span class="fn">describe</span>(<span class="str">'Discount calculator'</span>, () => {
+
+  <span class="fn">describe</span>(<span class="str">'when a valid discount is applied'</span>, () => {
+    <span class="fn">it</span>(<span class="str">'should reduce the price by the discount percentage'</span>, () => {
+      <span class="fn">expect</span>(<span class="fn">calculateDiscount</span>(<span class="num">100</span>, <span class="num">20</span>)).<span class="fn">toBe</span>(<span class="num">80</span>);
+    });
+  });
+
+  <span class="fn">describe</span>(<span class="str">'when the price is negative'</span>, () => {
+    <span class="fn">it</span>(<span class="str">'should throw an error'</span>, () => {
+      <span class="fn">expect</span>(() => <span class="fn">calculateDiscount</span>(-<span class="num">1</span>, <span class="num">10</span>)).<span class="fn">toThrow</span>();
+    });
+  });
+
+});
+
+<span class="cm">// Note: in Jest, test() and it() are identical — it() is just BDD convention</span></pre></div>
+
+  <div class="callout callout-info">
+    <div class="callout-label">ℹ In Jest, test() and it() are the same</div>
+    Use <code>test()</code> for TDD-style names ("calculates discount correctly") and <code>it()</code> for BDD-style sentences ("should return 80 when 20% off 100"). The choice is a convention, not a technical difference.
+  </div>
+
+
+  <!-- ═══════════════════════════════════════
+       06 — SUMMARY
+  ═══════════════════════════════════════ -->
+  <hr class="page-divider" />
+
+  <div id="summary" class="section-header">
+    <span class="badge badge-summary">06</span>
+    <span class="section-title">Keywords, tools &amp; tech summary</span>
+  </div>
+
+  <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:1rem;line-height:1.65;">Everything covered across both sessions — your quick-reference glossary.</p>
+
+  <p style="font-size:12px;font-family:var(--font-mono);font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-secondary);margin-bottom:0.5rem;">Core concepts</p>
+  <div class="kw-grid">
+    <span class="kw-pill"><span class="dot" style="background:#E24B4A;"></span>Unit Test</span>
+    <span class="kw-pill"><span class="dot" style="background:#EF9F27;"></span>Integration Test</span>
+    <span class="kw-pill"><span class="dot" style="background:#1D9E75;"></span>E2E Test</span>
+    <span class="kw-pill"><span class="dot" style="background:#89b4fa;"></span>Test Suite</span>
+    <span class="kw-pill"><span class="dot" style="background:#cba6f7;"></span>Test Case</span>
+    <span class="kw-pill"><span class="dot" style="background:#f38ba8;"></span>Assertion</span>
+    <span class="kw-pill"><span class="dot" style="background:#fab387;"></span>Test Runner</span>
+    <span class="kw-pill"><span class="dot" style="background:#a6e3a1;"></span>Code Coverage</span>
+    <span class="kw-pill"><span class="dot" style="background:#89dceb;"></span>Regression</span>
+    <span class="kw-pill"><span class="dot" style="background:#6c7086;"></span>Happy Path</span>
+    <span class="kw-pill"><span class="dot" style="background:#6c7086;"></span>Edge Case</span>
+  </div>
+
+  <p style="font-size:12px;font-family:var(--font-mono);font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-secondary);margin:1rem 0 0.5rem;">Mocking vocabulary</p>
+  <div class="kw-grid">
+    <span class="kw-pill"><span class="dot" style="background:#993C1D;"></span>Mock</span>
+    <span class="kw-pill"><span class="dot" style="background:#993C1D;"></span>Stub</span>
+    <span class="kw-pill"><span class="dot" style="background:#993C1D;"></span>Spy</span>
+    <span class="kw-pill"><span class="dot" style="background:#993C1D;"></span>Fake</span>
+    <span class="kw-pill"><span class="dot" style="background:#993C1D;"></span>Test Double</span>
+    <span class="kw-pill"><span class="dot" style="background:#993C1D;"></span>jest.mock()</span>
+    <span class="kw-pill"><span class="dot" style="background:#993C1D;"></span>jest.fn()</span>
+    <span class="kw-pill"><span class="dot" style="background:#993C1D;"></span>mockResolvedValue</span>
+    <span class="kw-pill"><span class="dot" style="background:#993C1D;"></span>mockRejectedValue</span>
+    <span class="kw-pill"><span class="dot" style="background:#993C1D;"></span>jest.clearAllMocks()</span>
+  </div>
+
+  <p style="font-size:12px;font-family:var(--font-mono);font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-secondary);margin:1rem 0 0.5rem;">Lifecycle hooks</p>
+  <div class="kw-grid">
+    <span class="kw-pill"><span class="dot" style="background:#3C3489;"></span>beforeAll()</span>
+    <span class="kw-pill"><span class="dot" style="background:#3C3489;"></span>afterAll()</span>
+    <span class="kw-pill"><span class="dot" style="background:#3C3489;"></span>beforeEach()</span>
+    <span class="kw-pill"><span class="dot" style="background:#3C3489;"></span>afterEach()</span>
+  </div>
+
+  <p style="font-size:12px;font-family:var(--font-mono);font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-secondary);margin:1rem 0 0.5rem;">Jest matchers used in both sessions</p>
+  <div class="kw-grid">
+    <span class="kw-pill"><span class="dot" style="background:#3B6D11;"></span>toBe()</span>
+    <span class="kw-pill"><span class="dot" style="background:#3B6D11;"></span>toEqual()</span>
+    <span class="kw-pill"><span class="dot" style="background:#3B6D11;"></span>toMatchObject()</span>
+    <span class="kw-pill"><span class="dot" style="background:#3B6D11;"></span>toHaveProperty()</span>
+    <span class="kw-pill"><span class="dot" style="background:#3B6D11;"></span>toHaveLength()</span>
+    <span class="kw-pill"><span class="dot" style="background:#3B6D11;"></span>toContain()</span>
+    <span class="kw-pill"><span class="dot" style="background:#3B6D11;"></span>toThrow()</span>
+    <span class="kw-pill"><span class="dot" style="background:#3B6D11;"></span>rejects.toThrow()</span>
+    <span class="kw-pill"><span class="dot" style="background:#3B6D11;"></span>toHaveBeenCalled()</span>
+    <span class="kw-pill"><span class="dot" style="background:#3B6D11;"></span>toHaveBeenCalledWith()</span>
+    <span class="kw-pill"><span class="dot" style="background:#3B6D11;"></span>toHaveBeenCalledTimes()</span>
+    <span class="kw-pill"><span class="dot" style="background:#3B6D11;"></span>not.*</span>
+    <span class="kw-pill"><span class="dot" style="background:#3B6D11;"></span>expect.arrayContaining()</span>
+    <span class="kw-pill"><span class="dot" style="background:#3B6D11;"></span>expect.objectContaining()</span>
+  </div>
+
+  <p style="font-size:12px;font-family:var(--font-mono);font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-secondary);margin:1rem 0 0.5rem;">Strategies &amp; methodologies</p>
+  <div class="kw-grid">
+    <span class="kw-pill"><span class="dot" style="background:#085041;"></span>TDD</span>
+    <span class="kw-pill"><span class="dot" style="background:#633806;"></span>BDD</span>
+    <span class="kw-pill"><span class="dot" style="background:#085041;"></span>Red → Green → Refactor</span>
+    <span class="kw-pill"><span class="dot" style="background:#633806;"></span>Given → When → Then</span>
+    <span class="kw-pill"><span class="dot" style="background:#5F5E5A;"></span>Separation of Concerns</span>
+    <span class="kw-pill"><span class="dot" style="background:#5F5E5A;"></span>Repository Pattern</span>
+  </div>
+
+  <p style="font-size:12px;font-family:var(--font-mono);font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-secondary);margin:1rem 0 0.5rem;">Tools &amp; libraries</p>
+  <div class="kw-grid">
+    <span class="kw-pill"><span class="dot" style="background:#89b4fa;"></span>Jest</span>
+    <span class="kw-pill"><span class="dot" style="background:#89b4fa;"></span>Node.js</span>
+    <span class="kw-pill"><span class="dot" style="background:#89b4fa;"></span>npm</span>
+    <span class="kw-pill"><span class="dot" style="background:#89b4fa;"></span>axios (mocked)</span>
+    <span class="kw-pill"><span class="dot" style="background:#89b4fa;"></span>Supertest</span>
+    <span class="kw-pill"><span class="dot" style="background:#89b4fa;"></span>Vitest (alternative)</span>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════
+       07 — REFERENCES
+  ═══════════════════════════════════════ -->
+  <div id="references" class="section-header">
+    <span class="badge badge-ref">07</span>
+    <span class="section-title">References &amp; further reading</span>
+  </div>
+
+  <p style="font-size:12px;font-family:var(--font-mono);font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-secondary);margin-bottom:0.75rem;">Official documentation</p>
+  <div class="ref-grid">
+    <a class="ref-card" href="https://jestjs.io/docs/getting-started" target="_blank" rel="noopener">
+      <div class="ref-type" style="color:#89b4fa;">Official Docs</div>
+      <div class="ref-title">Jest — Getting Started</div>
+      <div class="ref-desc">Installation, config, first test, CLI options.</div>
+      <div class="ref-url">jestjs.io/docs/getting-started</div>
+    </a>
+    <a class="ref-card" href="https://jestjs.io/docs/expect" target="_blank" rel="noopener">
+      <div class="ref-type" style="color:#89b4fa;">Official Docs</div>
+      <div class="ref-title">Jest — expect API</div>
+      <div class="ref-desc">Every matcher explained with examples. Bookmark this one.</div>
+      <div class="ref-url">jestjs.io/docs/expect</div>
+    </a>
+    <a class="ref-card" href="https://jestjs.io/docs/mock-functions" target="_blank" rel="noopener">
+      <div class="ref-type" style="color:#89b4fa;">Official Docs</div>
+      <div class="ref-title">Jest — Mock Functions</div>
+      <div class="ref-desc">How to create, use, and assert on mocks.</div>
+      <div class="ref-url">jestjs.io/docs/mock-functions</div>
+    </a>
+    <a class="ref-card" href="https://jestjs.io/docs/asynchronous" target="_blank" rel="noopener">
+      <div class="ref-type" style="color:#89b4fa;">Official Docs</div>
+      <div class="ref-title">Jest — Testing Async Code</div>
+      <div class="ref-desc">Promises, async/await, and callbacks in Jest.</div>
+      <div class="ref-url">jestjs.io/docs/asynchronous</div>
+    </a>
+  </div>
+
+  <p style="font-size:12px;font-family:var(--font-mono);font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-secondary);margin:1.25rem 0 0.75rem;">TDD &amp; BDD articles</p>
+  <div class="ref-grid">
+    <a class="ref-card" href="https://martinfowler.com/bliki/TestDrivenDevelopment.html" target="_blank" rel="noopener">
+      <div class="ref-type" style="color:#085041;">TDD</div>
+      <div class="ref-title">Martin Fowler — TDD</div>
+      <div class="ref-desc">The original thinking behind test-driven development from one of its advocates.</div>
+      <div class="ref-url">martinfowler.com/bliki/TDD</div>
+    </a>
+    <a class="ref-card" href="https://dannorth.net/introducing-bdd/" target="_blank" rel="noopener">
+      <div class="ref-type" style="color:#633806;">BDD</div>
+      <div class="ref-title">Dan North — Introducing BDD</div>
+      <div class="ref-desc">The original article that introduced BDD and the Given/When/Then format.</div>
+      <div class="ref-url">dannorth.net/introducing-bdd</div>
+    </a>
+    <a class="ref-card" href="https://kentcdodds.com/blog/write-tests" target="_blank" rel="noopener">
+      <div class="ref-type" style="color:#3C3489;">Article</div>
+      <div class="ref-title">Kent C. Dodds — Write Tests</div>
+      <div class="ref-desc">"Write tests. Not too many. Mostly integration." A widely-shared perspective on testing strategy.</div>
+      <div class="ref-url">kentcdodds.com/blog/write-tests</div>
+    </a>
+    <a class="ref-card" href="https://www.martinfowler.com/articles/mocksArentStubs.html" target="_blank" rel="noopener">
+      <div class="ref-type" style="color:#993C1D;">Mocking</div>
+      <div class="ref-title">Fowler — Mocks Aren't Stubs</div>
+      <div class="ref-desc">Explains the difference between mocks, stubs, spies, and fakes — classic required reading.</div>
+      <div class="ref-url">martinfowler.com/articles/mocksArentStubs</div>
+    </a>
+  </div>
+
+  <p style="font-size:12px;font-family:var(--font-mono);font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-secondary);margin:1.25rem 0 0.75rem;">Recommended books</p>
+  <div class="ref-grid">
+    <a class="ref-card" href="https://www.goodreads.com/book/show/387190.Test_Driven_Development" target="_blank" rel="noopener">
+      <div class="ref-type" style="color:#5F5E5A;">Book</div>
+      <div class="ref-title">Test-Driven Development by Example</div>
+      <div class="ref-desc">Kent Beck · The definitive TDD book. Walks through building software test-first from scratch.</div>
+    </a>
+    <a class="ref-card" href="https://www.goodreads.com/book/show/44919.The_Art_of_Unit_Testing" target="_blank" rel="noopener">
+      <div class="ref-type" style="color:#5F5E5A;">Book</div>
+      <div class="ref-title">The Art of Unit Testing</div>
+      <div class="ref-desc">Roy Osherove · Practical, language-agnostic guide to writing maintainable unit tests.</div>
+    </a>
+    <a class="ref-card" href="https://www.goodreads.com/book/show/4845981-growing-object-oriented-software-guided-by-tests" target="_blank" rel="noopener">
+      <div class="ref-type" style="color:#5F5E5A;">Book</div>
+      <div class="ref-title">Growing OO Software, Guided by Tests</div>
+      <div class="ref-desc">Freeman &amp; Pryce · How TDD shapes good software design from the outside in.</div>
+    </a>
+  </div>
+
+</div><!-- end .session -->
+</body>
+</html>

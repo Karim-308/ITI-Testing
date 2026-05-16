@@ -37,7 +37,7 @@ describe("isValidPassword", () => {
         const result = isValidPassword("I have no numbers haha");
 
         expect(result).toEqual({ valid: false, reason: 'Must contain a number' });
-    });
+    });//Shpud throw and error
 
     it("should fail and return object with valid= false when password has uppercase letters but no numbers", () => {
 
